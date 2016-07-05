@@ -700,6 +700,14 @@ class ViewSetMethodIntrospector(BaseMethodIntrospector):
         view.request.method = self.http_method
         return view
 
+    def ask_for_serializer_class(self):
+        # look into responsible instancemethod for serializer overrides
+        viewset_method = getattr(self.callback, self.method)
+        method_kwargs = getattr(viewset_method, 'kwargs', {})
+        if method_kwargs.get('serializer_class') is not None:
+            return method_kwargs['serializer_class']
+        return super(ViewSetMethodIntrospector, self).ask_for_serializer_class()
+
     def build_query_parameters(self):
         parameters = super(ViewSetMethodIntrospector, self) \
             .build_query_parameters()
